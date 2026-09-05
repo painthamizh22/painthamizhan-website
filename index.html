@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Daily finance and technology briefings built from public updates from major global companies.">
+  <title>Market & Tech Brief</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap nav">
+      <a class="brand" href="/">Market & Tech Brief</a>
+      <span class="tag">Finance × Technology</span>
+    </div>
+  </header>
+  <main class="wrap">
+    <section class="hero">
+      <p class="eyebrow">DAILY INTELLIGENCE</p>
+      <h1>Finance and technology, explained clearly.</h1>
+      <p class="lead">Original daily briefings based on recent public announcements, research and newsroom updates from major global companies.</p>
+    </section>
+    <section>
+      <div class="section-head"><h2>Latest briefings</h2><span id="updated"></span></div>
+      <div id="posts" class="posts"><p class="muted">Loading latest briefing…</p></div>
+    </section>
+  </main>
+  <footer class="wrap footer">Sources are linked in every briefing. Content is informational and not financial advice.</footer>
+  <script>
+    fetch('posts/index.json', {cache:'no-store'})
+      .then(r => r.json())
+      .then(posts => {
+        const root = document.getElementById('posts');
+        const updated = document.getElementById('updated');
+        if (!posts.length) { root.innerHTML = '<p class="muted">No briefings yet.</p>'; return; }
+        updated.textContent = 'Updated ' + new Date(posts[0].published_at).toLocaleDateString(undefined, {day:'numeric', month:'short', year:'numeric'});
+        root.innerHTML = posts.map(p => `
+          <article class="card">
+            <p class="date">${new Date(p.published_at).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'})} · ${p.category}</p>
+            <h3><a href="posts/${p.slug}.html">${escapeHtml(p.title)}</a></h3>
+            <p>${escapeHtml(p.excerpt)}</p>
+            <a class="read" href="posts/${p.slug}.html">Read briefing →</a>
+          </article>`).join('');
+      })
+      .catch(() => document.getElementById('posts').innerHTML = '<p class="muted">The latest briefing could not be loaded.</p>');
+    function escapeHtml(s) { return String(s).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+  </script>
+</body>
+</html>
